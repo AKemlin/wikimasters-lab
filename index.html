@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101523">
+  <title>WikiMasters Lab — tableau de bord</title>
+  <meta name="description" content="Suivi local des cartes WikiMasters, budget et tendances Wikipédia.">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">W<span>✦</span></div><div><strong>WikiMasters</strong><small>LAB / PROJET SCOLAIRE</small></div></div>
+      <div class="side-label">ESPACE DE TRAVAIL</div>
+      <nav aria-label="Navigation principale">
+        <button class="nav active" data-view="overview"><span class="ico">▦</span> Vue d’ensemble</button>
+        <button class="nav" data-view="collection"><span class="ico">▤</span> Collection</button>
+        <button class="nav" data-view="budget"><span class="ico">◫</span> Budget & résultats</button>
+        <button class="nav" data-view="demo"><span class="ico">▷</span> Simulateur</button>
+      </nav>
+      <div class="side-bottom">
+        <div class="connection"><span class="pulse"></span> Mode local actif</div>
+        <p>Les données sont stockées sur cet ordinateur.</p>
+        <a class="site-link" href="https://www.wiki-masters.com/collection" target="_blank" rel="noopener">Ouvrir ma collection ↗</a>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="crumb">ANALYSE <span>/</span> <strong id="crumb-title">VUE D’ENSEMBLE</strong></div><div class="top-actions"><span id="today"></span><a href="https://www.wiki-masters.com/collection" target="_blank" rel="noopener" class="top-link">WikiMasters ↗</a></div></header>
+      <div class="content">
+        <section class="view" id="view-overview">
+          <div class="hero"><div><div class="eyebrow"><span class="eyebrow-dot"></span> TABLEAU DE BORD PERSONNEL</div><h1>Comprendre chaque carte.<br><em>Décider avec les chiffres.</em></h1><p>Suis ta collection, compare la popularité des articles Wikipédia et garde tes dépenses de jeu sous contrôle.</p><div class="hero-actions"><button class="primary" data-view="collection">+ Ajouter une carte</button><button class="ghost" data-view="demo">Tester une ouverture</button></div></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="sample-card"><div class="card-no">№ 001 · ANALYSE</div><div class="star">✦</div><div class="sample-title">WIKIMASTERS<br>LAB</div><div class="sample-foot"><span>DONNÉES</span><span>★ ★ ★ ★</span></div></div></div></div>
+          <div class="section-head"><div><div class="eyebrow muted">EN UN COUP D’ŒIL</div><h2>Ta situation</h2></div><div class="segmented" role="group" aria-label="Source des données"><button class="filter active" data-filter="real">Mes données</button><button class="filter" data-filter="demo">Démo</button></div></div>
+          <div class="metrics" id="metrics"></div>
+          <div class="two-col"><section class="panel"><div class="panel-head"><div><div class="eyebrow muted">DISTRIBUTION</div><h3>Rareté des cartes</h3></div><span class="pill">Collection</span></div><div id="rarity-chart" class="rarity-chart"></div></section><section class="panel"><div class="panel-head"><div><div class="eyebrow muted">SIGNAL EXTERNE</div><h3>Cartes qui montent</h3></div><span class="pill">Vues Wikipédia</span></div><div id="hype-list"></div></section></div>
+          <div class="notice"><span>ⓘ</span><div><strong>La hype n’est pas un prix.</strong> Elle compare les vues d’un article Wikipédia sur les 7 derniers jours disponibles aux 7 jours précédents. Le marché WikiMasters peut évoluer autrement.</div></div>
+        </section>
+        <section class="view hidden" id="view-collection">
+          <div class="page-head"><div><div class="eyebrow">INVENTAIRE</div><h1>Ma collection</h1><p>Ajoute les cartes obtenues ou achetées pour suivre leur évolution.</p></div><button class="primary" id="add-card-btn">+ Ajouter une carte</button></div>
+          <div class="toolbar"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Rechercher une carte…" aria-label="Rechercher une carte"></label><select id="rarity-filter" aria-label="Filtrer par rareté"><option value="">Toutes les raretés</option><option>C</option><option>PC</option><option>R</option><option>SR</option><option>UR</option><option>L</option></select><span id="collection-count" class="toolbar-count"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>CARTE</th><th>RARETÉ</th><th>COÛT</th><th>VALEUR EST.</th><th>VENTE</th><th>HYPE 7 J</th><th></th></tr></thead><tbody id="cards-body"></tbody></table></div>
+          <div class="hint">Clique sur « Mesurer » pour récupérer les vues Wikipédia. La valeur et le prix de vente sont à renseigner manuellement.</div>
+        </section>
+        <section class="view hidden" id="view-budget">
+          <div class="page-head"><div><div class="eyebrow">WIKIBIDOU</div><h1>Budget & résultats</h1><p>Les dépenses et gains affichés concernent la monnaie du jeu.</p></div><button class="primary" id="add-pack-btn">+ Noter un paquet</button></div>
+          <div class="budget-grid"><div class="budget-main panel"><div class="eyebrow muted">TON PLAFOND</div><div class="budget-line"><strong id="budget-value">0</strong><span>WikiBidou</span></div><div class="progress"><div id="budget-progress"></div></div><p id="budget-caption"></p><form id="budget-form"><label for="budget-input">Modifier le budget</label><div class="inline-form"><input id="budget-input" type="number" min="0" step="1" required><button class="secondary" type="submit">Enregistrer</button></div></form></div><div class="budget-aside"><div class="small-panel"><span>Achats de cartes</span><strong id="card-cost">0</strong><small>WikiBidou</small></div><div class="small-panel"><span>Paquets ouverts</span><strong id="pack-cost">0</strong><small>WikiBidou dépensés</small></div><div class="small-panel green"><span>Ventes réalisées</span><strong id="sales-total">0</strong><small>WikiBidou reçus</small></div></div></div>
+          <div class="section-head"><div><div class="eyebrow muted">HISTORIQUE</div><h2>Paquets enregistrés</h2></div></div><div class="table-wrap"><table><thead><tr><th>DATE</th><th>TYPE</th><th>COÛT</th><th>CARTE(S) LIÉE(S)</th></tr></thead><tbody id="packs-body"></tbody></table></div>
+          <div class="notice"><span>ⓘ</span><div><strong>Lecture des résultats :</strong> le solde réalisé = ventes encaissées − achats de cartes − coût des paquets. Les cartes encore détenues ne comptent pas comme un gain réalisé.</div></div>
+        </section>
+        <section class="view hidden" id="view-demo">
+          <div class="page-head"><div><div class="eyebrow">BAC À SABLE</div><h1>Simulateur d’ouverture</h1><p>Observe une boucle d’ouverture automatique sans utiliser ton compte WikiMasters.</p></div><span class="demo-badge">MODE DÉMO</span></div>
+          <div class="demo-layout"><section class="panel demo-controls"><div class="panel-head"><div><div class="eyebrow muted">PARAMÈTRES</div><h3>Ta session</h3></div></div><label for="demo-max">Nombre de paquets maximum</label><input id="demo-max" type="number" min="1" max="20" value="5"><label for="demo-delay">Intervalle entre ouvertures</label><select id="demo-delay"><option value="1500">1,5 seconde</option><option value="3000">3 secondes</option><option value="5000">5 secondes</option></select><div class="demo-buttons"><button class="primary" id="demo-start">▶ Lancer la simulation</button><button class="secondary" id="demo-stop" disabled>Arrêter</button></div><div class="demo-counter"><span>Ouvertures de cette session</span><strong id="demo-count">0 / 5</strong></div><div class="progress"><div id="demo-progress"></div></div></section><section class="panel demo-feed"><div class="panel-head"><div><div class="eyebrow muted">EN DIRECT</div><h3>Journal d’ouverture</h3></div><span class="live-dot"></span></div><div id="demo-log" class="log"><div class="empty-log">Lance une session pour voir apparaître les cartes de démonstration.</div></div></section></div>
+          <div class="notice"><span>ⓘ</span><div>Cette simulation utilise des cartes fictives, enregistrées avec l’étiquette « Démo ». Elle ne se connecte pas à WikiMasters et ne dépense aucun WikiBidou.</div></div>
+        </section>
+        <footer><span>WIKIMASTERS LAB · VERSION WEB</span><div><button id="import-btn">Importer une sauvegarde</button><button id="export-btn">Exporter mes données</button></div><input id="import-file" type="file" accept="application/json,.json" hidden></footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="card-dialog"><form id="card-form" method="dialog"><div class="dialog-head"><div><div class="eyebrow">NOUVELLE ENTRÉE</div><h2>Ajouter une carte</h2></div><button type="button" class="close" data-close aria-label="Fermer">×</button></div><label for="card-title">Nom de l’article Wikipédia</label><input id="card-title" name="title" required maxlength="160" placeholder="Ex. Marie Curie"><div class="form-grid"><div><label for="card-rarity">Rareté</label><select id="card-rarity" name="rarity"><option>C</option><option>PC</option><option>R</option><option>SR</option><option>UR</option><option>L</option></select></div><div><label for="card-cost-input">Prix d’achat (WikiBidou)</label><input id="card-cost-input" name="cost" type="number" min="0" step="1" value="0"></div></div><div class="form-grid"><div><label for="card-value">Valeur estimée</label><input id="card-value" name="marketValue" type="number" min="0" step="1" placeholder="Facultatif"></div><div><label for="card-sale">Prix de vente encaissé</label><input id="card-sale" name="sale" type="number" min="0" step="1" placeholder="Facultatif"></div></div><div class="dialog-actions"><button type="button" class="secondary" data-close>Annuler</button><button type="submit" class="primary">Enregistrer la carte</button></div></form></dialog>
+  <dialog id="pack-dialog"><form id="pack-form" method="dialog"><div class="dialog-head"><div><div class="eyebrow">NOUVELLE ENTRÉE</div><h2>Noter un paquet</h2></div><button type="button" class="close" data-close aria-label="Fermer">×</button></div><label for="pack-cost-input">Coût du paquet en WikiBidou</label><input id="pack-cost-input" name="cost" type="number" min="0" step="1" value="0" required><p class="dialog-note">Tu pourras ajouter ensuite les cartes obtenues dans « Collection ».</p><div class="dialog-actions"><button type="button" class="secondary" data-close>Annuler</button><button type="submit" class="primary">Enregistrer</button></div></form></dialog>
+  <dialog id="edit-dialog"><form id="edit-form" method="dialog"><div class="dialog-head"><div><div class="eyebrow">MISE À JOUR</div><h2 id="edit-title">Modifier une carte</h2></div><button type="button" class="close" data-close aria-label="Fermer">×</button></div><input id="edit-id" type="hidden"><label for="edit-value">Valeur estimée en WikiBidou</label><input id="edit-value" type="number" min="0" step="1" placeholder="Inconnue"><label for="edit-sale">Prix de vente encaissé</label><input id="edit-sale" type="number" min="0" step="1" placeholder="Pas encore vendue"><div class="dialog-actions"><button type="button" class="secondary" data-close>Annuler</button><button type="submit" class="primary">Enregistrer</button></div></form></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
