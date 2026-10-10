@@ -17,7 +17,7 @@ Dans « Acheter & vendre », saisir une carte à surveiller avec un prix de réf
 
 Ces nombres ne sont que des seuils personnels. Ils ne disent pas qu'une carte se vendra au prix de référence, ni que l'offre est encore disponible. La hype Wikipédia n'entre pas dans les formules. Pour une carte issue d'un paquet, renseigner son coût attribué si un seuil de revente est souhaité, mais éviter de compter ce coût deux fois dans le budget.
 
-Le simulateur possède les commandes Lancer, Pause/Reprendre et Arrêter. Il utilise uniquement les données de démonstration locales. Aucun identifiant WikiMasters n'est demandé ou stocké.
+Le simulateur possède les commandes Lancer, Pause/Reprendre et Arrêter. « Effacer les données de démonstration » retire ses cartes et paquets fictifs sans toucher aux données réelles. Aucun identifiant WikiMasters n'est demandé ou stocké.
 
 ## Publication GitHub Pages
 
