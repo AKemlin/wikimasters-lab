@@ -46,6 +46,7 @@ async function api(path,options={}) {
     store.cards.unshift(item);writeStore(store);return item;
   }
   if(path==='/api/pack'&&method==='POST'){const item={id:id(),source:input.source==='demo'?'demo':'real',openedAt:new Date().toISOString(),cost:amount(input.cost)};store.packs.unshift(item);writeStore(store);return item;}
+  if(path==='/api/demo'&&method==='DELETE'){store.cards=store.cards.filter(x=>x.source!=='demo');store.packs=store.packs.filter(x=>x.source!=='demo');writeStore(store);return {ok:true};}
   if(path==='/api/settings'&&method==='POST'){
     if(Object.hasOwn(input,'budget'))store.settings.budget=amount(input.budget);
     if(Object.hasOwn(input,'margin'))store.settings.margin=percent(input.margin,20,500);
@@ -208,6 +209,7 @@ $('demo-max').oninput=()=>{if(demoState==='idle')$('demo-count').textContent=`0 
 $('demo-start').onclick=async()=>{if(demoState!=='idle')return;demoMax=Math.min(20,Math.max(1,Number($('demo-max').value)||5));demoDelay=Number($('demo-delay').value)||1500;demoOpened=0;$('demo-count').textContent=`0 / ${demoMax}`;$('demo-progress').style.width='0';$('demo-log').innerHTML='';demoState='running';demoButtons();await demoTick();};
 $('demo-pause').onclick=()=>{if(demoState==='running'){if(demoTimer)clearTimeout(demoTimer);demoTimer=null;demoState='paused';demoButtons();toast('Simulation en pause');}else if(demoState==='paused'){demoState='running';demoButtons();demoTimer=setTimeout(demoTick,demoDelay);toast('Simulation reprise');}};
 $('demo-stop').onclick=()=>stopDemo('Simulation arrêtée');
+$('demo-clear').onclick=async()=>{if(demoState!=='idle')stopDemo();await api('/api/demo',{method:'DELETE'});demoOpened=0;$('demo-count').textContent=`0 / ${$('demo-max').value||5}`;$('demo-progress').style.width='0';$('demo-log').innerHTML='<div class="empty-log">Lance une session pour voir apparaître les cartes de démonstration.</div>';await refresh();toast('Données de démonstration effacées');};
 $('import-btn').onclick=()=>$('import-file').click();
 $('export-btn').onclick=()=>{const blob=new Blob([JSON.stringify(readStore(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wiki-masters-lab-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const parsed=JSON.parse(await file.text());await api('/api/import',{method:'POST',body:JSON.stringify(parsed)});await refresh();toast('Sauvegarde importée');}catch(err){toast(err.message);}e.target.value='';};
