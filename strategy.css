@@ -1,0 +1,13 @@
+.strategy-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:15px; }
+.strategy-form { display:grid; grid-template-columns:1fr 1fr; gap:9px 12px; margin-top:15px; }
+.strategy-form label { color:#9eacbe; font-size:11px; font-weight:800; }
+.strategy-form input { width:100%; }
+.strategy-form button { grid-column:1 / -1; margin-top:8px; justify-self:start; }
+.strategy-explain p { color:#a7b5c4; font-size:12px; line-height:1.6; }
+.strategy-explain strong { color:#e6eef2; }
+.advice { display:inline-block; color:#bfcddd; background:#293547; padding:6px 8px; border-radius:6px; font-size:10px; font-weight:800; white-space:nowrap; }
+.advice-good { color:#caef9e; background:#29432e; }
+.demo-buttons { flex-wrap:wrap; }
+@media(max-width:900px) { .strategy-grid { grid-template-columns:1fr; } }
+@media(max-width:450px) { .strategy-form { grid-template-columns:1fr; } }
+
