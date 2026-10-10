@@ -21,13 +21,13 @@ function writeStore(x) { localStorage.setItem(STORAGE_KEY,JSON.stringify(x)); }
 const id=()=>crypto.randomUUID();
 const amount=x=>Math.max(0,Number(x)||0);
 async function measureHype(title) {
-  const end=new Date(Date.now()-2*86400_000), start=new Date(end.getTime()-27*86400_000);
-  const fmt=d=>d.toISOString().slice(0,10).replaceAll('-','')+'00';
-  const article=encodeURIComponent(title.trim().replaceAll(' ','_'));
-  const url=`https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/fr.wikipedia.org/all-access/user/${article}/daily/${fmt(start)}/${fmt(end)}`;
-  const res=await fetch(url,{headers:{'Api-User-Agent':'WikiMastersLab/1.0 (school project; GitHub Pages)'}});
+  const params=new URLSearchParams({action:'query',prop:'pageviews',titles:title.trim(),pvipdays:'28',format:'json',origin:'*'});
+  const res=await fetch(`https://fr.wikipedia.org/w/api.php?${params}`,{headers:{'Api-User-Agent':'WikiMastersLab/1.0 (school project; GitHub Pages)'}});
   if(!res.ok)throw new Error(res.status===404?'Article Wikipédia introuvable':`Wikimedia : HTTP ${res.status}`);
-  const views=(await res.json()).items.map(x=>Number(x.views)||0);
+  const payload=await res.json();
+  const page=Object.values(payload.query?.pages||{})[0];
+  if(!page||page.missing||!page.pageviews)throw new Error('Article Wikipédia introuvable');
+  const views=Object.entries(page.pageviews).sort(([a],[b])=>a.localeCompare(b)).map(([,value])=>Number(value)||0);
   if(views.length<14)throw new Error('Historique de vues insuffisant');
   const recent=views.slice(-7).reduce((a,b)=>a+b,0),previous=views.slice(-14,-7).reduce((a,b)=>a+b,0);
   return {recent,previous,change:previous?(recent-previous)/previous*100:null,checkedAt:new Date().toISOString(),source:'Wikimedia Pageviews, Wikipédia FR'};
@@ -138,3 +138,4 @@ $('export-btn').onclick=()=>{const blob=new Blob([JSON.stringify(readStore(),nul
 $('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const parsed=JSON.parse(await file.text());await api('/api/import',{method:'POST',body:JSON.stringify(parsed)});await refresh();toast('Sauvegarde importée');}catch(err){toast(err.message);}e.target.value='';};
 $('today').textContent=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
 refresh().catch(err=>toast(err.message));
+
