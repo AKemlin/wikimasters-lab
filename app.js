@@ -47,7 +47,14 @@ async function api(path,options={}) {
   if(match){const index=store.cards.findIndex(x=>x.id===match[1]);if(index<0)throw new Error('Carte introuvable');
     if(method==='DELETE'){store.cards.splice(index,1);writeStore(store);return {ok:true};}
     if(path.includes('action=hype')){store.cards[index].hype=await measureHype(store.cards[index].title);writeStore(store);return store.cards[index].hype;}
-    if(method==='PATCH'){for(const field of ['sale','marketValue'])if(Object.hasOwn(input,field))store.cards[index][field]=input[field]===''||input[field]==null?null:amount(input[field]);writeStore(store);return store.cards[index];}
+    if(method==='PATCH'){
+      for(const field of ['sale','marketValue'])if(Object.hasOwn(input,field))store.cards[index][field]=input[field]===''||input[field]==null?null:amount(input[field]);
+      if(input.recent!==''&&input.previous!==''){
+        const recent=amount(input.recent),previous=amount(input.previous);
+        store.cards[index].hype={recent,previous,change:previous?(recent-previous)/previous*100:null,checkedAt:new Date().toISOString(),source:'Saisie manuelle des vues Wikipédia'};
+      }
+      writeStore(store);return store.cards[index];
+    }
   }
   if(path==='/api/import'&&method==='POST'){
     if(!Array.isArray(input.cards)||!Array.isArray(input.packs))throw new Error('Sauvegarde invalide');
@@ -119,14 +126,14 @@ document.addEventListener('click', async e => {
   const nav=e.target.closest('[data-view]'); if(nav){navigate(nav.dataset.view);return;}
   const close=e.target.closest('[data-close]'); if(close){close.closest('dialog').close();return;}
   const hype=e.target.closest('[data-hype]'); if(hype){hype.disabled=true;hype.textContent='…';try{await api(`/api/card/${hype.dataset.hype}?action=hype`,{method:'POST'});await refresh();toast('Hype mise à jour');}catch(err){toast(err.message);hype.disabled=false;hype.textContent='Mesurer';}return;}
-  const edit=e.target.closest('[data-edit]'); if(edit){const item=data.cards.find(x=>x.id===edit.dataset.edit);if(!item)return;$('edit-id').value=item.id;$('edit-title').textContent=item.title;$('edit-value').value=item.marketValue??'';$('edit-sale').value=item.sale??'';$('edit-dialog').showModal();return;}
+  const edit=e.target.closest('[data-edit]'); if(edit){const item=data.cards.find(x=>x.id===edit.dataset.edit);if(!item)return;$('edit-id').value=item.id;$('edit-title').textContent=item.title;$('edit-value').value=item.marketValue??'';$('edit-sale').value=item.sale??'';$('edit-recent').value=item.hype?.recent??'';$('edit-previous').value=item.hype?.previous??'';$('edit-pageviews').href='https://pageviews.wmcloud.org/pageviews/?project=fr.wikipedia.org&pages='+encodeURIComponent(item.title);$('edit-dialog').showModal();return;}
   const del=e.target.closest('[data-delete]');if(del){if(!confirm('Supprimer cette carte du suivi ?'))return;try{await api(`/api/card/${del.dataset.delete}`,{method:'DELETE'});await refresh();toast('Carte supprimée');}catch(err){toast(err.message);}return;}
 });
 $('add-card-btn').onclick=()=>$('card-dialog').showModal();
 $('add-pack-btn').onclick=()=>$('pack-dialog').showModal();
 $('card-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await api('/api/card',{method:'POST',body:JSON.stringify(Object.fromEntries(f))});$('card-dialog').close();e.target.reset();await refresh();toast('Carte ajoutée');}catch(err){toast(err.message);}};
 $('pack-form').onsubmit=async e=>{e.preventDefault();try{await api('/api/pack',{method:'POST',body:JSON.stringify({cost:$('pack-cost-input').value})});$('pack-dialog').close();await refresh();toast('Paquet ajouté');}catch(err){toast(err.message);}};
-$('edit-form').onsubmit=async e=>{e.preventDefault();try{await api(`/api/card/${$('edit-id').value}`,{method:'PATCH',body:JSON.stringify({marketValue:$('edit-value').value,sale:$('edit-sale').value})});$('edit-dialog').close();await refresh();toast('Carte mise à jour');}catch(err){toast(err.message);}};
+$('edit-form').onsubmit=async e=>{e.preventDefault();try{await api(`/api/card/${$('edit-id').value}`,{method:'PATCH',body:JSON.stringify({marketValue:$('edit-value').value,sale:$('edit-sale').value,recent:$('edit-recent').value,previous:$('edit-previous').value})});$('edit-dialog').close();await refresh();toast('Carte mise à jour');}catch(err){toast(err.message);}};
 $('budget-form').onsubmit=async e=>{e.preventDefault();try{await api('/api/settings',{method:'POST',body:JSON.stringify({budget:$('budget-input').value})});await refresh();toast('Budget enregistré');}catch(err){toast(err.message);}};
 $('search').oninput=renderCollection; $('rarity-filter').onchange=renderCollection;
 document.querySelectorAll('.filter').forEach(btn=>btn.onclick=()=>{filter=btn.dataset.filter;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===btn));render();});
